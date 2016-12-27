@@ -60,7 +60,7 @@ generate defs = do
   defTbl tblTypName tblDatName = do
     s <- newName "s"
     str <- newName "str"
-    dataD (cxt []) tblTypName [PlainTV str, PlainTV s] [con s str] []
+    dataD (cxt []) tblTypName [PlainTV str, PlainTV s] Nothing [con s str] (mapM conT [])
     where
       con s str = recC tblDatName $ map toMem defs where
         toMem (Definition nont typ _) = do
@@ -68,7 +68,7 @@ generate defs = do
                  | otherwise = parseType' typ
           t <- [t| HT.HashTable $(varT s) Int
                    (Result $(varT str) $tt) |]
-          return (mkName $ "tbl_" ++nont, NotStrict, t)
+	  return (mkName $ "tbl_" ++nont, (Bang NoSourceUnpackedness NoSourceStrictness), t)
 
   instTbl :: Name -> Name -> DecQ
   instTbl tblTypName tblDatName = do
